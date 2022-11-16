@@ -36,7 +36,7 @@ def ppo_policy_error(data: namedtuple,
     surr1 = ratio * adv
     # <b>Clipped surrogate objective:</b> $$clip(r(\theta), 1-\epsilon, 1+\epsilon) A^{\pi_{old}}(s, a)$$
     surr2 = ratio.clamp(1 - clip_ratio, 1 + clip_ratio) * adv
-    # Dual clip proposed by Tencent.
+    # Dual clip proposed by https://arxiv.org/abs/1912.09729.
     # Only use dual_clip when adv < 0.
     if dual_clip is not None:
         clip1 = torch.min(surr1, surr2)
