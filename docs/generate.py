@@ -84,7 +84,10 @@ def main(src_py_path, dst_html_path):
                     with tag('div', klass='docs doc-strings'):
                         with tag('p'):
                             if cnt == 0:
-                                with tag('b'):
+                                with tag('p'):
+                                    with tag('a', href='index.html'):
+                                        with tag('b'):
+                                            text("首页<br>")
                                     text(doc_data)
                             else:
                                 text(doc_data)
