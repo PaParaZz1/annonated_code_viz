@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"></meta><title>Annonated Algorithm Visualization</title><link rel="stylesheet" href="pylit.css?v=1"></link><link rel="stylesheet" href="solarized.css"></link><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/katex.min.css" integrity="sha384-Juol1FqnotbkyZUT5Z7gUPjQ9gzlwCENvUZTpQBAPxtusdwFLRy382PSDx5UUJ4/" crossorigin="anonymous"></link><script src="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/katex.min.js" integrity="sha384-97gW6UIJxnlKemYavrqDHSX3SiygeOwIZhwyOKRfSaf0JWKRVj9hLASHgFTzT+0O" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous" onload="renderMathInElement(document.body);" defer="True"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.61.0/lib/codemirror.min.css"></link><script src="https://cdn.jsdelivr.net/npm/codemirror@5.61.0/lib/codemirror.min.js"></script><script src="https://cdn.jsdelivr.net/npm/codemirror@5.61.0/mode/python/python.min.js"></script></head><body><div class="section" id="section-0"><div class="docs doc-strings"><p><b>PyTorch implementation of "Gaussian distribution for continuous action" in PPO</b></p><a href="https://github.com/opendilab/PPOxFamily" target="_blank"><img alt="GitHub" style="max-width:100%;" src="https://img.shields.io/github/stars/opendilab/PPOxFamily?style=social"></img></a>  <a href="https://space.bilibili.com/1112854351?spm_id_from=333.337.0.0" target="_blank"><img alt="bilibili" style="max-width:100%;" src="https://img.shields.io/badge/bilibili-video%20course-blue"></img></a>  <a href="https://twitter.com/OpenDILab" rel="nofollow" target="_blank"><img alt="twitter" style="max-width:100%;" src="https://img.shields.io/twitter/follow/opendilab?style=social"></img></a><br><a href="https://github.com/opendilab/PPOxFamily" target="_blank">View code on GitHub</a></div></div><div class="section" id="section-1"><div class="docs doc-strings"><p>        <b>Overview</b><br>            The definition of continuous action policy network used in PPO, which is mainly composed<br>            by three parts: encoder, mu and log_sigma.</p></div><div class="code"><pre><code id="code_1" name="py_code">from typing import Dict
+import torch
+import torch.nn as nn
+from torch.distributions import Normal, Independent
+
+
+class ContinuousPolicyNetwork(nn.Module):
+    def __init__(self, obs_shape: int, action_shape: int) -> None:</code></pre></div></div><div class="section" id="section-3"><div class="docs doc-strings"><p>        PyTorch necessary requirements for extending nn.Module.</p></div><div class="code"><pre><code id="code_3" name="py_code">        super(ContinuousPolicyNetwork, self).__init__()</code></pre></div></div><div class="section" id="section-4"><div class="docs doc-strings"><p>        Define encoder module, which maps raw state into embedding vector.<br>        It could be different for various state, such as Convolution Neural Network for image state.<br>        Here we use two-layer MLP for vector state.</p></div><div class="code"><pre><code id="code_4" name="py_code">        self.encoder = nn.Sequential(
+            nn.Linear(obs_shape, 16),
+            nn.ReLU(),
+            nn.Linear(16, 32),
+            nn.ReLU(),
+        )</code></pre></div></div><div class="section" id="section-5"><div class="docs doc-strings"><p>        Define mu module, which is a FC and outputs the argument mu for gaussian distribution.</p></div><div class="code"><pre><code id="code_5" name="py_code">        self.mu = nn.Linear(32, action_shape)</code></pre></div></div><div class="section" id="section-6"><div class="docs doc-strings"><p>        <b>Overview</b><br>            The computation graph of continuous action policy network used in PPO.</p></div><div class="code"><pre><code id="code_6" name="py_code">        self.log_sigma = nn.Parameter(torch.zeros(1, action_shape))
+
+    def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:</code></pre></div></div><div class="section" id="section-8"><div class="docs doc-strings"><p>        Transform original state into embedding vector (i.e. (B, *) -> (B, N)).</p></div><div class="code"><pre><code id="code_8" name="py_code">        x = self.encoder(x)</code></pre></div></div><div class="section" id="section-9"><div class="docs doc-strings"><p>        Output the argument mu depending on the embedding vector.</p></div><div class="code"><pre><code id="code_9" name="py_code">        mu = self.mu(x)</code></pre></div></div><div class="section" id="section-10"><div class="docs doc-strings"><p>        Utilize broadcast mechanism to make the same shape between log_sigma and mu.<br>        ``zeros_like`` operation doesn't pass gradient.</p></div><div class="code"><pre><code id="code_10" name="py_code">        log_sigma = self.log_sigma + torch.zeros_like(mu)</code></pre></div></div><div class="section" id="section-11"><div class="docs doc-strings"><p>        Utilize exponential opearation to produce the actual sigma.</p></div><div class="code"><pre><code id="code_11" name="py_code">        sigma = torch.exp(log_sigma)
+        return {'mu': mu, 'sigma': sigma}
+
+</code></pre></div></div><div class="section" id="section-12"><div class="docs doc-strings"><p>    <b>Overview</b><br>        The function of sampling continuous action, input is a dict with two keys 'mu' and 'sigma',<br>        both of them has shape = (B, action_shape), output shape = (B, action_shape).<br>        In this example, batch_shape = (B, ), event_shape = (action_shape, ), sample_shape = ().</p></div><div class="code"><pre><code id="code_12" name="py_code">def sample_continuous_action(logits: Dict[str, torch.Tensor]) -> torch.Tensor:</code></pre></div></div><div class="section" id="section-14"><div class="docs doc-strings"><p>    Construct gaussian distribution with $$\mu, \sigma$$<br>    link: https://en.wikipedia.org/wiki/Normal_distribution</p></div><div class="code"><pre><code id="code_14" name="py_code">    dist = Normal(logits['mu'], logits['sigma'])</code></pre></div></div><div class="section" id="section-15"><div class="docs doc-strings"><p>    Ensure each event is independent with each other.</p></div><div class="code"><pre><code id="code_15" name="py_code">    dist = Independent(dist, 1)</code></pre></div></div><div class="section" id="section-16"><div class="docs doc-strings"><p>    Sample action_shape actions per sample and return it.</p></div><div class="code"><pre><code id="code_16" name="py_code">    return dist.sample()
+
+</code></pre></div></div><div class="section" id="section-17"><div class="docs doc-strings"><p>    <b>Overview</b><br>        The function of testing sampling continuous action. Construct a standard continuous action<br>        policy and sample a group of action.</p></div><div class="code"><pre><code id="code_17" name="py_code">def test_sample_continuous_action():</code></pre></div></div><div class="section" id="section-19"><div class="docs doc-strings"><p>    Set batch_size = 4, obs_shape = 10, action_shape = 6.<br>    action_shape is different from discrete and continuous action. The former is the possible choice<br>    of a discrete action while the latter is the number of continuous action.</p></div><div class="code"><pre><code id="code_19" name="py_code">    B, obs_shape, action_shape = 4, 10, 6</code></pre></div></div><div class="section" id="section-20"><div class="docs doc-strings"><p>    Generate state data from uniform distribution.</p></div><div class="code"><pre><code id="code_20" name="py_code">    state = torch.rand(B, obs_shape)</code></pre></div></div><div class="section" id="section-21"><div class="docs doc-strings"><p>    Define continuous action network (which is similar to reparameterization) with encoder, mu and log_sigma.</p></div><div class="code"><pre><code id="code_21" name="py_code">    policy_network = ContinuousPolicyNetwork(obs_shape, action_shape)</code></pre></div></div><div class="section" id="section-22"><div class="docs doc-strings"><p>    Policy network forward procedure, input state and output dict-type logits.</p></div><div class="code"><pre><code id="code_22" name="py_code">    logits = policy_network(state)
+    assert isinstance(logits, dict)
+    assert logits['mu'].shape == (B, action_shape)
+    assert logits['sigma'].shape == (B, action_shape)</code></pre></div></div><div class="section" id="section-23"><div class="docs doc-strings"><p>    Sample action accoding to corresponding logits (i.e., mu and sigma).</p></div><div class="code"><pre><code id="code_23" name="py_code">    action = sample_continuous_action(logits)
+    assert action.shape == (B, action_shape)
+
+</code></pre></div></div></body><script type="text/javascript">
+window.onload = function(){
+    var codeElement = document.getElementsByName('py_code');
+    var lineCount = 1;
+    for (var i = 0; i < codeElement.length; i++) {
+        var code = codeElement[i].innerText;
+        if (code.length <= 1) {
+            continue;
+        }
+
+        codeElement[i].innerHTML = "";
+
+        var codeMirror = CodeMirror(
+          codeElement[i],
+          {
+            value: code,
+            mode: "python",
+            theme: "solarized dark",
+            lineNumbers: true,
+            firstLineNumber: lineCount,
+            readOnly: true,
+            lineWrapping: true,
+          }
+        );
+        var noNewLineCode = code.replace(/[\r\n]/g, "");
+        lineCount += code.length - noNewLineCode.length + 1;
+    }
+};
+</script></html>
