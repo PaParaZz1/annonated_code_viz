@@ -75,6 +75,11 @@ def main(src_py_path, dst_html_path):
                 doc_data = doc_data.replace('\n', '<br>')
                 doc_data = doc_data.replace('**:', '</b>')
                 doc_data = doc_data.replace('**', '<b>')
+                # doc_data = doc_data.replace(' ``', ' <span style="color:#6c6c6d;font-family:Monaco,IBMPlexMono;">')
+                doc_data = doc_data.replace(' ``', ' <span style="color:#00cbf694;font-family:Monaco,IBMPlexMono;">')
+                doc_data = doc_data.replace('`` ', '</span> ')
+                doc_data = doc_data.replace('<link ', '<a href="')
+                doc_data = doc_data.replace(' link>', '">Related Link</a>')
                 with tag('div', klass='section', id='section-{}'.format(cnt)):
                     with tag('div', klass='docs doc-strings'):
                         with tag('p'):
@@ -98,8 +103,7 @@ def main(src_py_path, dst_html_path):
                             text('<br>')
                             with tag('a', href="https://github.com/opendilab/PPOxFamily", target="_blank"):
                                 text("View code on GitHub")
-                    if cnt == 0:
-                        return
+                            return
                     with tag('div', klass='code'):
                         with tag('pre'):
                             with tag('code', id="code_{}".format(cnt), name="py_code"):

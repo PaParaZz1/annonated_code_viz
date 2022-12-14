@@ -15,14 +15,15 @@ def ppo_policy_error(data: namedtuple,
                      dual_clip: Optional[float] = None) -> Tuple[namedtuple, namedtuple]:
     """
     **Overview**:
-        Implementation of Proximal Policy Optimization (arXiv:1707.06347) with entropy bounus, value_clip and dual_clip.
+        Implementation of Proximal Policy Optimization <link https://arxiv.org/pdf/1707.06347.pdf link>
+        with entropy bounus, value_clip and dual_clip.
     """
     # Unpack data: $$<\pi_{new}(a|s), \pi_{old}(a|s), a, A^{\pi_{old}}(s, a), w>$$
     logit_new, logit_old, action, adv, weight = data
     # Prepare weight for default cases.
     if weight is None:
         weight = torch.ones_like(adv)
-    # Prepare policy distribution and get log propability.
+    # Prepare policy distribution from logit and get log propability.
     dist_new = torch.distributions.categorical.Categorical(logits=logit_new)
     dist_old = torch.distributions.categorical.Categorical(logits=logit_old)
     logp_new = dist_new.log_prob(action)
@@ -36,7 +37,7 @@ def ppo_policy_error(data: namedtuple,
     surr1 = ratio * adv
     # <b>Clipped surrogate objective:</b> $$clip(r(\theta), 1-\epsilon, 1+\epsilon) A^{\pi_{old}}(s, a)$$
     surr2 = ratio.clamp(1 - clip_ratio, 1 + clip_ratio) * adv
-    # Dual clip proposed by https://arxiv.org/abs/1912.09729.
+    # Dual clip proposed by <link https://arxiv.org/abs/1912.09729 link> .
     # Only use dual_clip when adv < 0.
     if dual_clip is not None:
         clip1 = torch.min(surr1, surr2)
