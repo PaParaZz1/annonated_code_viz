@@ -156,6 +156,5 @@ def main(src_py_path, dst_html_path):
 
 if __name__ == "__main__":
     main('ppo.py', 'ppo.html')
-    main('sample_action.py', 'sample_action.html')
-    # main('sample_action_zh.py', 'sample_action_zh.html')
-    main('gaussian.py', 'gaussian.html')
+    main('discrete.py', 'discrete.html')
+    main('continuous.py', 'continuous.html')
