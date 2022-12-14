@@ -39,7 +39,7 @@ class StateCode(IntEnum):
     BLOCK_COMMENT = 2
 
 
-def main(src_py_path):
+def main(src_py_path, dst_html_path):
     with open(src_py_path, 'r') as f:
         src = f.read()
     line_data = src.split('\n')
@@ -83,6 +83,23 @@ def main(src_py_path):
                                     text(doc_data)
                             else:
                                 text(doc_data)
+                        if cnt == 0:
+                            with tag('a', href="https://github.com/opendilab/PPOxFamily", target="_blank"):
+                                with tag('img', alt="GitHub", style="max-width:100%;"):
+                                    doc.attr(src="https://img.shields.io/github/stars/opendilab/PPOxFamily?style=social")
+                            text('  ')
+                            with tag('a', href="https://space.bilibili.com/1112854351?spm_id_from=333.337.0.0", target="_blank"):
+                                with tag('img', alt="bilibili", style="max-width:100%;"):
+                                    doc.attr(src="https://img.shields.io/badge/bilibili-video%20course-blue")
+                            text('  ')
+                            with tag('a', href="https://twitter.com/OpenDILab", rel="nofollow", target="_blank"):
+                                with tag('img', alt="twitter", style="max-width:100%;"):
+                                    doc.attr(src="https://img.shields.io/twitter/follow/opendilab?style=social")
+                            text('<br>')
+                            with tag('a', href="https://github.com/opendilab/PPOxFamily", target="_blank"):
+                                text("View code on GitHub")
+                    if cnt == 0:
+                        return
                     with tag('div', klass='code'):
                         with tag('pre'):
                             with tag('code', id="code_{}".format(cnt), name="py_code"):
@@ -94,6 +111,8 @@ def main(src_py_path):
             for i in range(len(line_data)):
                 print(i, line_data[i])
                 no_space_data = line_data[i].strip()
+                if no_space_data.startswith('if __name__ == "__main__":'):
+                    break
                 if state == StateCode.NORMAL:
                     if no_space_data.startswith('"""'):  # block comment
                         state = StateCode.BLOCK_COMMENT
@@ -103,6 +122,8 @@ def main(src_py_path):
                         cnt += 1
                         state = StateCode.LINE_COMMENT
                         line_comment.append(line_data[i].replace('# ', ''))  # remove '# '
+                        if 'delimiter' in line_data[i]:
+                            line_comment[-1] = ''
                     else:
                         line_code.append(line_data[i])
                 elif state == StateCode.LINE_COMMENT:
@@ -129,9 +150,12 @@ def main(src_py_path):
     result = doc.getvalue()
     result = result.replace('&lt;', '<')
     result = result.replace('&gt;', '>')
-    with open('result.html', 'w') as f:
+    with open(dst_html_path, 'w') as f:
         f.write('<!DOCTYPE html>\n' + result)
 
 
 if __name__ == "__main__":
-    main('ppo.py')
+    main('ppo.py', 'ppo.html')
+    main('sample_action.py', 'sample_action.html')
+    # main('sample_action_zh.py', 'sample_action_zh.html')
+    main('gaussian.py', 'gaussian.html')

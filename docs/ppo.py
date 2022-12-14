@@ -1,5 +1,5 @@
 """
-PyTorch implementation of Proximal Policy Optimization (PPO), powered by OpenDILab
+PyTorch implementation of Proximal Policy Optimization (PPO)
 """
 from typing import Optional, Tuple
 from collections import namedtuple
