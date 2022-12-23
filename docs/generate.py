@@ -22,7 +22,7 @@ window.onload = function(){
             theme: "solarized dark",
             lineNumbers: true,
             firstLineNumber: lineCount,
-            readOnly: true,
+            readOnly: false,
             lineWrapping: true,
           }
         );
@@ -104,7 +104,7 @@ def main(src_py_path, dst_html_path):
                                 with tag('img', alt="twitter", style="max-width:100%;"):
                                     doc.attr(src="https://img.shields.io/twitter/follow/opendilab?style=social")
                             text('<br>')
-                            with tag('a', href="https://github.com/opendilab/PPOxFamily", target="_blank"):
+                            with tag('a', href="https://github.com/opendilab/PPOxFamily/tree/main/{}".format(src_py_path), target="_blank"):
                                 text("View code on GitHub")
                             return
                     with tag('div', klass='code'):
@@ -162,6 +162,7 @@ def main(src_py_path, dst_html_path):
 
 
 if __name__ == "__main__":
-    main('ppo.py', 'ppo.html')
-    main('discrete.py', 'discrete.html')
-    main('continuous.py', 'continuous.html')
+    #main('ppo.py', 'ppo.html')
+    main('chapter2_action/discrete_tutorial.py', 'discrete.html')
+    main('chapter2_action/continuous_tutorial.py', 'continuous.html')
+    main('chapter2_action/hybrid_tutorial.py', 'hybrid.html')
