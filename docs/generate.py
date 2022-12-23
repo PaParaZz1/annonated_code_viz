@@ -87,7 +87,7 @@ def main(src_py_path, dst_html_path):
                                 with tag('p'):
                                     with tag('a', href='index.html'):
                                         with tag('b'):
-                                            text("首页<br>")
+                                            text("HOME<br>")
                                     text(doc_data)
                             else:
                                 text(doc_data)
@@ -151,6 +151,11 @@ def main(src_py_path, dst_html_path):
                     raise RuntimeError(state)
             item_fn('\n'.join(line_comment), '\n'.join(line_code), cnt)
 
+            with tag('div', klass='section', id='section-{}'.format(cnt)):
+                with tag('div', klass='docs doc-strings'):
+                    with tag('p'):
+                        with tag('i'):
+                            text('If you have any questions or advices about this documation, you can raise issues in GitHub (https://github.com/opendilab/PPOxFamily) or email us (opendilab@pjlab.org.cn).')
         with tag('script', type="text/javascript"):
             text(code_js)
 
@@ -162,7 +167,6 @@ def main(src_py_path, dst_html_path):
 
 
 if __name__ == "__main__":
-    #main('ppo.py', 'ppo.html')
     main('chapter2_action/discrete_tutorial.py', 'discrete.html')
     main('chapter2_action/continuous_tutorial.py', 'continuous.html')
     main('chapter2_action/hybrid_tutorial.py', 'hybrid.html')
