@@ -155,7 +155,10 @@ def main(src_py_path, dst_html_path):
                 with tag('div', klass='docs doc-strings'):
                     with tag('p'):
                         with tag('i'):
-                            text('If you have any questions or advices about this documation, you can raise issues in GitHub (https://github.com/opendilab/PPOxFamily) or email us (opendilab@pjlab.org.cn).')
+                            if 'zh' in src_py_path:
+                                text('如果读者关于本文档有任何问题和建议，可以在 GitHub 提 issue 或是直接发邮件给我们 (opendilab@pjlab.org.cn) 。')
+                            else:
+                                text('If you have any questions or advices about this documation, you can raise issues in GitHub (https://github.com/opendilab/PPOxFamily) or email us (opendilab@pjlab.org.cn).')
         with tag('script', type="text/javascript"):
             text(code_js)
 
@@ -168,5 +171,6 @@ def main(src_py_path, dst_html_path):
 
 if __name__ == "__main__":
     main('chapter2_action/discrete_tutorial.py', 'discrete.html')
+    main('chapter2_action/discrete_tutorial_zh.py', 'discrete_zh.html')
     main('chapter2_action/continuous_tutorial.py', 'continuous.html')
     main('chapter2_action/hybrid_tutorial.py', 'hybrid.html')
