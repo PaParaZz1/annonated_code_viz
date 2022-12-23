@@ -25,7 +25,7 @@ class ContinuousPolicyNetwork(nn.Module):
     def __init__(self, obs_shape: int, action_shape: int) -> None:
         """
         **ContinuousPolicyNetwork 定义概述**:
-            定义 PPO 中所使用的的连续动作策略网络，其主要包含三部分：编码器（encoder），均值（mu）和对数空间标准差（log_sigma）
+            定义 PPO 中所使用的连续动作策略网络，其主要包含三部分：编码器（encoder），均值（mu）和对数空间标准差（log_sigma）
         """
         # 继承 PyTorch 神经网络类所必需的操作，自定义的神经网络必须是 ``nn.Module`` 的子类
         super(ContinuousPolicyNetwork, self).__init__()
@@ -50,13 +50,13 @@ class ContinuousPolicyNetwork(nn.Module):
     def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
         """
         **forward 函数功能概述**:
-            描述 PPO 中所使用的的连续动作策略网络的前向计算图
+            描述 PPO 中所使用的连续动作策略网络的前向计算图
             ``x -> encoder -> mu -> \mu`` .
             ``log_sigma -> exp -> sigma`` .
         """
         # 将原始的状态信息转换为特征向量，维度变化为: $$(B, *) -> (B, N)$$
         x = self.encoder(x)
-        # 根绝特征向量输出动作均值 mu，维度变化为: $$(B, N) -> (B, A)$$
+        # 根据特征向量输出动作均值 mu，维度变化为: $$(B, N) -> (B, A)$$
         mu = self.mu(x)
         # 借助”广播“机制让对数空间标准差的维度和均值一致（在 batch 维度上复制）
         # ``zeros_like`` 操作并不会传递梯度
@@ -108,7 +108,7 @@ def test_sample_continuous_action():
     assert isinstance(logit, dict)
     assert logit['mu'].shape == (B, action_shape)
     assert logit['sigma'].shape == (B, action_shape)
-    # # 根据 logit (mu, sigma) 采样得到最终的连续动作
+    # 根据 logit (mu, sigma) 采样得到最终的连续动作
     action = sample_continuous_action(logit)
     assert action.shape == (B, action_shape)
 

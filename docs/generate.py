@@ -88,7 +88,6 @@ def main(src_py_path, dst_html_path):
                                     with tag('a', href='index.html'):
                                         with tag('b'):
                                             text("HOME<br>")
-                                    text(doc_data)
                             else:
                                 text(doc_data)
                         if cnt == 0:
@@ -106,6 +105,8 @@ def main(src_py_path, dst_html_path):
                             text('<br>')
                             with tag('a', href="https://github.com/opendilab/PPOxFamily/tree/main/{}".format(src_py_path), target="_blank"):
                                 text("View code on GitHub")
+                            text('<br><br>')
+                            text(doc_data)
                             return
                     with tag('div', klass='code'):
                         with tag('pre'):

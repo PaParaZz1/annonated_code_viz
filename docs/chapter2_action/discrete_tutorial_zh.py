@@ -23,7 +23,7 @@ class DiscretePolicyNetwork(nn.Module):
     def __init__(self, obs_shape: int, action_shape: int) -> None:
         """
         **DiscretePolicyNetwork 定义概述**:
-            定义 PPO 中所使用的的离散动作策略网络，其主要包含两部分：编码器（encoder）和决策输出头（head）
+            定义 PPO 中所使用的离散动作策略网络，其主要包含两部分：编码器（encoder）和决策输出头（head）
         """
         # 继承 PyTorch 神经网络类所必需的操作，自定义的神经网络必须是 ``nn.Module`` 的子类
         super(DiscretePolicyNetwork, self).__init__()
@@ -42,7 +42,7 @@ class DiscretePolicyNetwork(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         **forward 函数功能概述**:
-            描述 PPO 中所使用的的离散动作策略网络的前向计算图
+            描述 PPO 中所使用的离散动作策略网络的前向计算图
             ``x -> encoder -> head -> logit`` .
         """
         # 将原始的状态信息转换为特征向量，维度变化为: $$(B, *) -> (B, N)$$
@@ -60,7 +60,7 @@ def sample_action(logit: torch.Tensor) -> torch.Tensor:
         在这个示例中，课程中提到的 distributions 工具库的三个维度分别为
         batch_shape = (B, ), event_shape = (), sample_shape = ()
     """
-    # 将 logit 转化为概率（logit 一般指神经网络的原始输出，不经过集火函数，例如最后一层全连接层的输出）
+    # 将 logit 转化为概率（logit 一般指神经网络的原始输出，不经过激活函数，例如最后一层全连接层的输出）
     # $$\text{Softmax}(x_{i}) = \frac{\exp(x_i)}{\sum_j \exp(x_j)}$$
     prob = torch.softmax(logit, dim=-1)
     # 构建广义伯努利分布。它的概率质量函数为: $$f(x=i|\boldsymbol{p})=p_i$$
