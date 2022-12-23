@@ -25,7 +25,7 @@ class DiscretePolicyNetwork(nn.Module):
         **Overview**:
             The definition of discrete action policy network used in PPO, which is mainly composed of two parts: encoder and head.
         """
-        # PyTorch necessary requirements for extending ``nn.Module``. Our network should also subclass this class.
+        # PyTorch necessary requirements for extending ``nn.Module`` . Our network should also subclass this class.
         super(DiscretePolicyNetwork, self).__init__()
         # Define encoder module, which maps raw state into embedding vector.
         # It could be different for various state, such as Convolution Neural Network (CNN) for image state and Multilayer perceptron (MLP) for vector state, respectively.

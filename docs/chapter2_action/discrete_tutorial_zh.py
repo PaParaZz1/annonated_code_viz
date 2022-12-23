@@ -22,9 +22,8 @@ import torch.nn as nn
 class DiscretePolicyNetwork(nn.Module):
     def __init__(self, obs_shape: int, action_shape: int) -> None:
         """
-        **Overview**:
-        **概述**:
-            PPO 中所使用的的离散动作策略网络的定义，其中主要包含两部分：编码器（encoder）和决策输出头（head）
+        **DiscretePolicyNetwork 定义概述**:
+            定义 PPO 中所使用的的离散动作策略网络，其主要包含两部分：编码器（encoder）和决策输出头（head）
         """
         # 继承 PyTorch 神经网络类所必需的操作，自定义的神经网络必须是 ``nn.Module`` 的子类
         super(DiscretePolicyNetwork, self).__init__()
@@ -42,8 +41,8 @@ class DiscretePolicyNetwork(nn.Module):
     # delimiter
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
-        **Overview**:
-            PPO 中所使用的的离散动作策略网络的前向计算图
+        **forward 函数功能概述**:
+            描述 PPO 中所使用的的离散动作策略网络的前向计算图
             ``x -> encoder -> head -> logit`` .
         """
         # 将原始的状态信息转换为特征向量，维度变化为: $$(B, *) -> (B, N)$$
@@ -56,8 +55,8 @@ class DiscretePolicyNetwork(nn.Module):
 # delimiter
 def sample_action(logit: torch.Tensor) -> torch.Tensor:
     """
-    **概述**:
-        采样离散动作的函数，输入维度为 (B, action_shape) 输出维度为 output shape = (B, )
+    **sample_action 函数功能概述**:
+        输入 logit 采样获得离散动作，输入维度为 (B, action_shape) 输出维度为 output shape = (B, )
         在这个示例中，课程中提到的 distributions 工具库的三个维度分别为
         batch_shape = (B, ), event_shape = (), sample_shape = ()
     """
@@ -74,7 +73,7 @@ def sample_action(logit: torch.Tensor) -> torch.Tensor:
 # delimiter
 def test_sample_action():
     """
-    **概述**:
+    **test_sample_action 函数功能概述**:
         离散动作空间的主函数，构建一个简单的策略网络，执行前向计算过程，并采样得到一组离散动作
     """
     # 设置相关参数 batch_size = 4, obs_shape = 10, action_shape = 6.

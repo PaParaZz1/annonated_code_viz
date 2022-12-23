@@ -173,4 +173,6 @@ if __name__ == "__main__":
     main('chapter2_action/discrete_tutorial.py', 'discrete.html')
     main('chapter2_action/discrete_tutorial_zh.py', 'discrete_zh.html')
     main('chapter2_action/continuous_tutorial.py', 'continuous.html')
+    main('chapter2_action/continuous_tutorial_zh.py', 'continuous_zh.html')
     main('chapter2_action/hybrid_tutorial.py', 'hybrid.html')
+    main('chapter2_action/hybrid_tutorial_zh.py', 'hybrid_zh.html')
